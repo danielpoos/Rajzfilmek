@@ -22,4 +22,19 @@ return function(Slim\App $app){
         $response->getBody()->write($out);
         return $response->withStatus(201)->withHeader('Content-type', 'application/json');
     });
+    $app->delete('/rajzfilmek/{id}', function(Request $request, Response $response, array $args){
+        if(!is_numeric($args['id']) || $args['id'] <= 0){
+            $out = json_encode(['error' => 'Az idnak pozitiv egesznek kell lennie!']);
+            $response->getBody()->write($out);
+            return $response->withStatus(400)->withHeader('Content-type', 'application/json');
+        }
+        $rajzfilm = Rajzfilm::getById($args['id']);
+        if ($rajzfilm === null) {
+            $out = json_encode(['error' => 'Nincs ilyen id a tablaban!']);
+            $response->getBody()->write($out);
+            return $response->withStatus(404)->withHeader('Content-type', 'application/json');
+        }
+        $rajzfilm->torles();
+        return $response->withStatus(204);
+    });
 };
